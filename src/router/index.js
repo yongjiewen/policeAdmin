@@ -48,24 +48,18 @@ export const constantRoutes = [
   },
 
   {
-    path: '/example',
+    path: '/police',
     component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: '路由', icon: 'el-icon-s-help' },
+    redirect: '/police/index',
+    name: 'Police',
+    meta: { title: '预警信息', icon: 'el-icon-s-help' },
     children: [
       {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: '子路由1', icon: 'table' }
+        path: 'index',
+        name: 'Police',
+        component: () => import('@/views/police/index'),
+        meta: { title: '预警信息', icon: 'table' }
       },
-      {
-        path: 'table2',
-        name: 'table2',
-        component: () => import('@/views/table/index'),
-        meta: { title: '子路由2', icon: 'tree' }
-      }
     ]
   },
   // 404 
@@ -119,7 +113,7 @@ const createRouter = () => new Router({
 
 const router = createRouter()
 
-export function resetRouter() {
+export function resetRouter () {
   const newRouter = createRouter()
   router.matcher = newRouter.matcher // reset router
 }
