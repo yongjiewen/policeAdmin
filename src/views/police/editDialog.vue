@@ -1,12 +1,16 @@
 <template>
-  <el-dialog title="预警信息" :visible="dialogFormVisible" @close="close">
-    <el-form ref="form" :model="form" label-width="90px">
+  <el-dialog
+    title="修改预警信息"
+    :visible="dialogFormVisible"
+    @close="$emit('close')"
+  >
+    <el-form ref="editform" :model="formData" label-width="90px">
       <!-- <el-form-item label="采集时间:">
         <el-col :span="11">
           <el-date-picker
             type="date"
             placeholder="选择日期"
-            v-model="form.coll_time"
+            v-model="formData.coll_time"
             style="width: 100%"
           ></el-date-picker>
         </el-col>
@@ -14,14 +18,13 @@
         <el-col :span="11">
           <el-time-picker
             placeholder="选择时间"
-            v-model="form.date2"
+            v-model="formData.date2"
             style="width: 100%"
           ></el-time-picker>
         </el-col>
       </el-form-item> -->
-
       <el-form-item label="数据来源:">
-        <el-select v-model="form.data_sources" placeholder="请选择数据来源">
+        <el-select v-model="formData.data_sources" placeholder="请选择数据来源">
           <el-option
             :label="item.name"
             :value="item.value"
@@ -31,7 +34,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="预警单位:">
-        <el-select v-model="form.unit" placeholder="请选择预警单位">
+        <el-select v-model="formData.unit" placeholder="请选择预警单位">
           <el-option
             :label="item.name"
             :value="item.value"
@@ -41,7 +44,10 @@
         </el-select>
       </el-form-item>
       <el-form-item label="预警状态:">
-        <el-select v-model="form.warning_status" placeholder="请选择预警状态">
+        <el-select
+          v-model="formData.warning_status"
+          placeholder="请选择预警状态"
+        >
           <el-option
             :label="item.name"
             :value="item.value"
@@ -51,7 +57,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="诈骗类型:">
-        <el-select v-model="form.scams_type" placeholder="请选择诈骗类型">
+        <el-select v-model="formData.scams_type" placeholder="请选择诈骗类型">
           <el-option
             :label="item.name"
             :value="item.value"
@@ -61,23 +67,30 @@
         </el-select>
       </el-form-item>
       <el-form-item label="预警手机:">
-        <el-input v-model="form.phone" type="tel"></el-input>
+        <el-input v-model="formData.phone" type="tel"></el-input>
       </el-form-item>
       <el-form-item label="关联信息:">
-        <el-input v-model="form.related_info"></el-input>
+        <el-input v-model="formData.related_info"></el-input>
       </el-form-item>
-
       <el-form-item label="入库时间:">
-        <el-input v-model="form.storage_time"></el-input>
+        <el-input v-model="formData.storage_time"></el-input>
       </el-form-item>
       <el-form-item label="下发时间:">
-        <el-radio-group v-model="form.release_time">
-          <el-radio label="0">否</el-radio>
-          <el-radio label="1">下发(当前时间)</el-radio>
-        </el-radio-group>
+        <div v-if="status_time">
+          <span style="margin-right: 15px">{{ status_time }}</span>
+          <el-radio-group v-model="formData.release_time">
+            <el-radio label="1">修改下发时间(当前时间)</el-radio>
+          </el-radio-group>
+        </div>
+        <div v-else>
+          <el-radio-group v-model="formData.release_time">
+            <el-radio label="0">否</el-radio>
+            <el-radio label="1">下发(当前时间)</el-radio>
+          </el-radio-group>
+        </div>
       </el-form-item>
       <el-form-item label="预警级别:">
-        <el-radio-group v-model="form.lelver">
+        <el-radio-group v-model="formData.lelver">
           <el-radio label="高危">高危</el-radio>
           <el-radio label="高">高</el-radio>
           <el-radio label="中">中</el-radio>
@@ -85,33 +98,35 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="是否见面:">
-        <el-radio-group v-model="form.is_meet">
+        <el-radio-group v-model="formData.is_meet">
           <el-radio label="否">否</el-radio>
           <el-radio label="是">是</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="是否被骗:">
-        <el-radio-group v-model="form.is_deceived">
+        <el-radio-group v-model="formData.is_deceived">
           <el-radio label="否">否</el-radio>
           <el-radio label="是">是</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="是否照相:">
-        <el-radio-group v-model="form.is_phone">
+        <el-radio-group v-model="formData.is_phone">
           <el-radio label="否">否</el-radio>
           <el-radio label="是">是</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="备注:">
-        <el-input type="textarea" v-model="form.remark"></el-input>
+        <el-input type="textarea" v-model="formData.remark"></el-input>
       </el-form-item>
       <el-form-item label="操作员:">
-        <el-input v-model="form.nickname"></el-input>
+        <el-input v-model="formData.nickname"></el-input>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="close">取 消</el-button>
-      <el-button type="primary" @click="addClick">添 加</el-button>
+      <el-button @click="$emit('close')">取 消</el-button>
+      <el-button type="primary" @click="$emit('editClick', formData)"
+        >修 改</el-button
+      >
     </div>
   </el-dialog>
 </template>
@@ -122,27 +137,17 @@ export default {
     dialogFormVisible: {
       type: Boolean,
       default: false
+    },
+    formData: {
+      type: Object,
+      default: () => ({})
+    },
+    status_time: {
+      default: ""
     }
   },
   data() {
     return {
-      form: {
-        coll_time: "",
-        data_sources: "",
-        scams_type: "",
-        unit: "",
-        phone: "",
-        lelver: "",
-        related_info: "",
-        warning_status: "",
-        is_meet: "",
-        is_deceived: "",
-        is_phone: "",
-        storage_time: "",
-        release_time: "",
-        remark: "",
-        nickname: ""
-      },
       unit: [
         {
           name: "桥峰派出所",
@@ -284,16 +289,6 @@ export default {
         }
       ]
     };
-  },
-  methods: {
-    close() {
-      this.$emit("close");
-      this.form = { warning_status: "未下发" };
-    },
-    addClick() {
-      this.$emit("addClick", this.form);
-      this.form = { warning_status: "未下发" };
-    }
   }
 };
 </script>
